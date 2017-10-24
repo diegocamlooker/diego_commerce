@@ -1,6 +1,5 @@
 connection: "thelook"
 
-
 include: "*.view.lkml" # include all the views in this project
 
 include: "*.dashboard.lookml"  # include all dashboards in this project
@@ -11,9 +10,10 @@ datagroup: long_persistence {
   sql_trigger: select current_date ;;
 }
 
-
 explore: order_items {
-  persist_with: long_persistence
+
+  fields: [ALL_FIELDS*,-users.name] # excluding customer names from the analysis
+  persist_with: long_persistence # added 4h refresh with the data
   join: orders {
     type: left_outer
     sql_on: ${order_items.order_id} = ${orders.id} ;;
@@ -29,18 +29,24 @@ explore: order_items {
   label: "Order Items"
 }
 explore: orders {
-  join: users {
-    type: left_outer
+
+  fields: [ALL_FIELDS*,-users.name] # excluding customer names from the analysis
+  join:  users{
+    type: inner # every order has to have a user
+    view_label: "Customers" # https://docs.looker.com/reference/explore-params/view_label-for-join
     sql_on: ${orders.user_id} = ${users.id} ;;
     relationship: many_to_one
   }
   group_label: "Diego Commerce"
   description: "View orders"
   label: "Order"
-}
-
-explore: temp {
-  hidden: yes
+  sql_always_where: ${users.age}>'18' ;; # only info from user above 18
+  always_filter: {
+    filters: {
+      field: users.created_year
+      value: "2010"
+    }
+  }
 }
 
 explore: users {
