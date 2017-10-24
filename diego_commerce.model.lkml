@@ -1,4 +1,4 @@
-connection: "aaa_test_azure_sql_dw"
+connection: "thelook"
 
 # include all the views
 include: "*.view"
