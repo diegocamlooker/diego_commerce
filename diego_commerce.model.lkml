@@ -5,7 +5,7 @@ include: "*.view.lkml" # include all the views in this project
 include: "*.dashboard.lookml"  # include all dashboards in this project
 
 datagroup: long_persistence {
-  max_cache_age: "4 hours"
+  max_cache_age: "24 hours"
   #more info: https://docs.looker.com/data-modeling/learning-lookml/caching
   sql_trigger: select current_date ;;
 }
@@ -39,11 +39,11 @@ explore: orders {
   }
   group_label: "Diego Commerce"
   description: "View orders"
-  label: "Order"
+  label: "Orders 2010"
   sql_always_where: ${users.age}>'18' ;; # only info from user above 18
   always_filter: {
     filters: {
-      field: users.created_year
+      field: users.created_year # we only get the data from the 2010
       value: "2010"
     }
   }
@@ -53,4 +53,13 @@ explore: users {
   group_label: "Diego Commerce"
   description: "View the users of the platform"
   label: "Users"
+}
+
+explore: users_facts {
+  persist_with: long_persistence
+  group_label: "Diego Commerce"
+  description: "View the users facts"
+  label: "Users facts"
+
+
 }
